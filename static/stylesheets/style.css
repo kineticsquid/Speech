@@ -1,0 +1,39 @@
+/* style.css
+ * This file provides css styles.
+ */
+
+body,html {
+	background-color: #6b7b84;
+	height: 100%;
+	margin-top: 40px;
+	margin-bottom: 20px;
+	margin-left: 40px;
+	margin-right: 40px;
+	font-family: monospace;
+	font-size: 130%;
+}
+
+div.top {
+    width: 80%;
+    align: center;
+}
+
+textarea {
+  width: 80%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  resize: none;
+  font-family: monospace;
+  font-size: 100%;
+}
+
+select {
+	font-family: monospace;
+	font-size: 100%;
+}
+
+

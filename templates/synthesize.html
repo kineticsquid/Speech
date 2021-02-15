@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <form action="\synthesize" method="post" novalidate>
+            <div>
+                <h3>Text to synthesize:</h3>
+            </div>
+            <div>
+            <textarea id="text_to_synthsize" name="text_to_synthsize">
+            </textarea>
+            </div>
+            <br>
+            <div>
+                <h3>Choose a language model:</h3>
+            </div>
+            <div>
+                <select name="language_model" id="language_model">
+                    {% for voice in voice_list %}
+                    <option value="{{voice.name}}">
+                        {{voice.description}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+    </form>
+</div>
+{% endblock %}
+
