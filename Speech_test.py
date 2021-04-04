@@ -5,8 +5,21 @@ import json
 import sys
 import time
 import io
-from flask import Flask, request, render_template, Response, url_for, jsonify
+from flask import Flask, request, render_template, Response, url_for, jsonify, send_from_directory
 import urllib.parse
+import uuid
+
+AUDIO_FORMATS = {
+    'audio/basic',
+    'audio/flac',
+    'audio/l16',
+    'audio/ogg',
+    'audio/mp3',
+    'audio/mpeg',
+    'audio/mulaw',
+    'audio/wav',
+    'audio/webm'
+}
 
 app = Flask(__name__)
 port = os.getenv('PORT', '5030')
@@ -15,7 +28,7 @@ port = os.getenv('PORT', '5030')
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+logging.basicConfig(level=logging.INFO)
 
 env_var = 'TTS_API_URL'
 if env_var in os.environ:
@@ -52,7 +65,7 @@ if env_var in os.environ:
     url_root = os.environ[env_var]
 else:
     url_root = ''
-AUDIO_FORMAT = 'audio/mp3'
+AUDIO_FORMAT = 'audio/ogg'
 
 http_headers = {'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -119,8 +132,8 @@ def voices():
     else:
         raise Exception(result.content)
 
-@app.route('/synthesize', methods=['GET', 'POST'])
-def synthesize():
+@app.route('/input', methods=['GET', 'POST'])
+def input():
     result = requests.get(TTS_API_URL + '/v1/voices', auth=tts_auth, headers=http_headers)
     if result.status_code != 200:
         raise Exception('Error retrieving voices: %s - %s' % (result.status_code, result.content))
@@ -129,15 +142,49 @@ def synthesize():
     for voice in content['voices']:
         voice_list.append({'name': voice['name'], 'description': voice['description']})
 
-    return render_template('synthesize.html', url_root=url_root, voice_list=voice_list)
+    return render_template('input.html',
+                           url_root=url_root,
+                           voice_list=voice_list,
+                           audio_format_list=AUDIO_FORMATS)
 
+@app.route('/synthesize', methods=['GET', 'POST'])
+def synthesize():
+    form = request.form
+    text = form['text_to_synthsize']
+    voice = form['voice']
+    audio_format = form['audio_format']
 
-def synth():
-    response = requests.get(TTS_API_URL + '/v1/synthesize', auth=tts_auth, params=payload)
+    headers = {"Content-Type": "application/json", "accept": audio_format}
+    parameters = {'voice': voice}
+    payload = {"text": text}
+
+    response = requests.post(TTS_API_URL + '/v1/synthesize',
+                            auth=tts_auth,
+                            headers=headers,
+                            params=parameters,
+                            data=json.dumps(payload))
     if response.status_code == 200:
         sound_data = response.content
-        audio = AudioSegment.from_file(io.BytesIO(sound_data), format="mp3")
+        index = audio_format.find('/')
+        file_type = audio_format[index+1:len(audio_format)]
+        audio_filename = "%s.%s" % (str(uuid.uuid1()), file_type)
+        f = open("static/audio/%s" % audio_filename, 'wb')
+        f.write(sound_data)
+        f.close()
+        print('returning audio from %s' % audio_filename)
+        return send_from_directory('static/audio', audio_filename)
+    else:
+        message = "Error synthesizing \'%s\' with voice \'%s\'.\n<br>%s - %s" % (text,
+                                                                                 voice,
+                                                                                 response.status_code,
+                                                                                 response.content)
+        return render_template('blank.html',
+                               url_root=url_root,
+                               message=message)
 
+@app.route('/test/<path:file_name>', methods=['GET', 'POST'])
+def test(file_name):
+    return send_from_directory('static/audio', file_name)
 
 if __name__ == '__main__':
     logging.info('Starting %s....' % sys.argv[0])
@@ -146,10 +193,5 @@ if __name__ == '__main__':
     logging.info('Environment Variables:')
 
     app.run(host='0.0.0.0', port=int(port))
-
-    payload = {'accept': AUDIO_FORMAT,
-               'text': 'Hello world',
-               'voice': 'en-GB_CharlotteV3Voice'
-               }
 
     print('hi')
