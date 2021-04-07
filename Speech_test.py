@@ -1,4 +1,3 @@
-import logging
 import os
 import requests
 import json
@@ -11,12 +10,10 @@ import uuid
 
 AUDIO_FORMATS = {
     'audio/basic',
-    'audio/flac',
-    'audio/l16',
     'audio/ogg',
     'audio/mp3',
+    'audio/flac',
     'audio/mpeg',
-    'audio/mulaw',
     'audio/wav',
     'audio/webm'
 }
@@ -27,8 +24,6 @@ port = os.getenv('PORT', '5030')
 # Need these next two lines to eliminate the 'A secret key is required to use CSRF.' error
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
-
-logging.basicConfig(level=logging.INFO)
 
 env_var = 'TTS_API_URL'
 if env_var in os.environ:
@@ -74,17 +69,29 @@ http_headers = {'Content-Type': 'application/json',
 stt_auth = ('apikey', STT_API_KEY),
 tts_auth = ('apikey', TTS_API_KEY)
 
+result = requests.get(TTS_API_URL + '/v1/voices', auth=tts_auth, headers=http_headers)
+if result.status_code != 200:
+    raise Exception('Error retrieving voices: %s - %s' % (result.status_code, result.content))
+content = result.json()
+voice_list = []
+for voice in content['voices']:
+    voice_list.append({'name': voice['name'], 'description': voice['description']})
+
 
 @app.before_request
 def do_something_whenever_a_request_comes_in():
-    logging.info('Environ:\t%s' % request.environ)
-    logging.info('Path:\t%s' % request.path)
-    logging.info('Full_path:\t%s' % request.full_path)
-    logging.info('Script_root:\t%s' % request.script_root)
-    logging.info('Url:\t%s' % request.url)
-    logging.info('Base_url:\t%s' % request.base_url)
-    logging.info('Url_root:\t%s' % request.url_root)
-    logging.info('Scheme:\t%s' % request.scheme)
+    r = request
+    url = r.url
+    method = r.method
+    print('>>>> Call into Speech Test: %s ' % method, url)
+    print('Environ:\t%s' % request.environ)
+    print('Path:\t%s' % request.path)
+    print('Full_path:\t%s' % request.full_path)
+    print('Script_root:\t%s' % request.script_root)
+    print('Url:\t%s' % request.url)
+    print('Base_url:\t%s' % request.base_url)
+    print('Url_root:\t%s' % request.url_root)
+    print('Scheme:\t%s' % request.scheme)
 
 
 @app.after_request
@@ -104,7 +111,7 @@ def apply_headers(response):
 
 @app.errorhandler(Exception)
 def handle_bad_request(e):
-    logging.error('Error: %s' % str(e))
+    print('Error: %s' % str(e))
     return render_template('blank.html', message=str(e), title='Error!', url_root=url_root)
 
 
@@ -134,18 +141,14 @@ def voices():
 
 @app.route('/input', methods=['GET', 'POST'])
 def input():
-    result = requests.get(TTS_API_URL + '/v1/voices', auth=tts_auth, headers=http_headers)
-    if result.status_code != 200:
-        raise Exception('Error retrieving voices: %s - %s' % (result.status_code, result.content))
-    content = result.json()
-    voice_list = []
-    for voice in content['voices']:
-        voice_list.append({'name': voice['name'], 'description': voice['description']})
 
     return render_template('input.html',
                            url_root=url_root,
                            voice_list=voice_list,
-                           audio_format_list=AUDIO_FORMATS)
+                           voice="Lisa: American English female voice. Dnn technology.",
+                           audio_format_list=AUDIO_FORMATS,
+                           audio_file="static/audio/lisa-intro.ogg",
+                           audio_format="audio/ogg")
 
 @app.route('/synthesize', methods=['GET', 'POST'])
 def synthesize():
@@ -167,12 +170,22 @@ def synthesize():
         sound_data = response.content
         index = audio_format.find('/')
         file_type = audio_format[index+1:len(audio_format)]
-        audio_filename = "%s.%s" % (str(uuid.uuid1()), file_type)
-        f = open("static/audio/%s" % audio_filename, 'wb')
+        audio_filename = "static/audio/%s.%s" % (str(uuid.uuid1()), file_type)
+        f = open(audio_filename, 'wb')
         f.write(sound_data)
         f.close()
         print('returning audio from %s' % audio_filename)
-        return send_from_directory('static/audio', audio_filename)
+        return render_template('input.html',
+                               url_root=url_root,
+                               voice_list=voice_list,
+                               voice=voice,
+                               audio_format_list=AUDIO_FORMATS,
+                               audio_file=audio_filename,
+                               audio_format=audio_format)
+        # return render_template('play.html',
+        #                        audio_file=audio_filename,
+        #                        audio_format=audio_format,
+        #                        url_root=url_root)
     else:
         message = "Error synthesizing \'%s\' with voice \'%s\'.\n<br>%s - %s" % (text,
                                                                                  voice,
@@ -186,12 +199,21 @@ def synthesize():
 def test(file_name):
     return send_from_directory('static/audio', file_name)
 
+
+@app.route('/play')
+def play():
+    return render_template('play.html',
+                           audio_file="static/audio/lisa-intro.ogg",
+                           audio_format="audio/mp3",
+                           url_root=url_root)
+
 if __name__ == '__main__':
-    logging.info('Starting %s....' % sys.argv[0])
-    logging.info('Build: %s' % time.ctime(os.path.getmtime(sys.argv[0])))
-    logging.info('Python: ' + sys.version)
-    logging.info('Environment Variables:')
+    print('Starting %s....' % sys.argv[0])
+    print('Python: ' + sys.version)
+    print("url_root: %s" % url_root)
+    print('Environment Variables:')
+    for key in os.environ.keys():
+        print('%s:\t%s' % (key, os.environ.get(key)))
 
     app.run(host='0.0.0.0', port=int(port))
 
-    print('hi')
