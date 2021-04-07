@@ -4,7 +4,7 @@ import json
 import sys
 import time
 import io
-from flask import Flask, request, render_template, Response, url_for, jsonify, send_from_directory
+from flask import Flask, request, render_template, Response, url_for, jsonify, send_from_directory, abort
 import urllib.parse
 import uuid
 
@@ -200,12 +200,22 @@ def test(file_name):
     return send_from_directory('static/audio', file_name)
 
 
-@app.route('/play')
-def play():
-    return render_template('play.html',
-                           audio_file="static/audio/lisa-intro.ogg",
-                           audio_format="audio/mp3",
+@app.route('/play', defaults={'file_path': ''})
+@app.route('/play/<path:file_path>')
+def play(file_path):
+    BASE_DIR = './static/audio'
+    abs_path = os.path.join(BASE_DIR, file_path)
+    if not os.path.exists(abs_path):
+        return abort(404)
+
+    if os.path.isfile(abs_path):
+        return render_template('play.html',
+                           audio_file=abs_path,
+                           # audio_format="audio/mp3",
                            url_root=url_root)
+    else:
+        files = os.listdir(abs_path)
+        return render_template('list_files.html', files=files, url_root=url_root)
 
 if __name__ == '__main__':
     print('Starting %s....' % sys.argv[0])
