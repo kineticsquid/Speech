@@ -195,11 +195,6 @@ def synthesize():
                                url_root=url_root,
                                message=message)
 
-@app.route('/test/<path:file_name>', methods=['GET', 'POST'])
-def test(file_name):
-    return send_from_directory('static/audio', file_name)
-
-
 @app.route('/play', defaults={'file_path': ''})
 @app.route('/play/<path:file_path>')
 def play(file_path):
@@ -216,6 +211,11 @@ def play(file_path):
     else:
         files = os.listdir(abs_path)
         return render_template('list_files.html', files=files, url_root=url_root)
+
+@app.route('/speak', methods=['GET', 'POST'])
+def speak():
+    return render_template('speak.html',
+                           url_root=url_root)
 
 if __name__ == '__main__':
     print('Starting %s....' % sys.argv[0])

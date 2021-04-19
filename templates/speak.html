@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <form action="/synthesize" method="post" novalidate>
+        <textarea autofocus id="text_to_synthsize" name="text_to_synthsize" placeholder="Input text to synthesize into speech"></textarea>
+        <br>
+        <div class="row">
+            <div class="column">
+                <h3 align="center">Voice:</h3>
+                <select name="voice" id="voice" class="language">
+                    {% for voice in voice_list %}
+                    <option value="{{voice.name}}">
+                        {{voice.description}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="column">
+                <h3 align="center">Audio format:</h3>
+                <select name="audio_format" id="audio_format" class="audio">
+                    {% for format in audio_format_list %}
+                        <option value="{{format}}">
+                            {{format}}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button type="submit"><b>Synthesize</b></button>
+    </form>
+</div>
+<div align="center">
+    <p>
+        {{voice}} - {{audio_format}}
+    </p>
+    <audio controls="true" autoplay="true" name="speech-audio-player">
+	    <source src="{{audio_file}}" type="{{audio_format}}">
+    </audio>
+</div>
+{% endblock %}
+
