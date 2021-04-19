@@ -10,14 +10,29 @@ from base64 import b64encode
 from ibm_watson import IAMTokenManager
 from autobahn.asyncio.websocket import WebSocketClientProtocol, WebSocketClientFactory
 
-STT_WS_URL = "wss://api.us-east.speech-to-text.watson.cloud.ibm.com/instances/9fdf0622-9bcb-4593-831a-737f46ca749c"
-STT_API_URL = "https://api.us-east.speech-to-text.watson.cloud.ibm.com/instances/9fdf0622-9bcb-4593-831a-737f46ca749c"
-STT_HOST = "api.us-east.speech-to-text.watson.cloud.ibm.com"
-STT_PORT = 443
-
 env_var = 'STT_API_KEY'
 if env_var in os.environ:
     STT_API_KEY = os.environ[env_var]
+else:
+    raise Exception("Error no %s Defined!" % env_var)
+env_var = 'STT_WS_URL'
+if env_var in os.environ:
+    STT_WS_URL = os.environ[env_var]
+else:
+    raise Exception("Error no %s Defined!" % env_var)
+env_var = 'STT_API_URL'
+if env_var in os.environ:
+    STT_API_URL = os.environ[env_var]
+else:
+    raise Exception("Error no %s Defined!" % env_var)
+env_var = 'STT_HOST'
+if env_var in os.environ:
+    STT_HOST = os.environ[env_var]
+else:
+    raise Exception("Error no %s Defined!" % env_var)
+env_var = 'STT_PORT'
+if env_var in os.environ:
+    STT_PORT = os.environ[env_var]
 else:
     raise Exception("Error no %s Defined!" % env_var)
 
