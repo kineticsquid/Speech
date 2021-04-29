@@ -1,5 +1,0 @@
-requests
-pydub
-ffmpeg
-flask_wtf
-wtforms

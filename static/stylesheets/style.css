@@ -10,12 +10,16 @@ body,html {
 	margin-left: 40px;
 	margin-right: 40px;
 	font-family: monospace;
-	font-size: 110%;
+	font-size: 100%;
 }
 
 div.top {
     width: 80%;
     align: center;
+}
+
+div.padding {
+    margin-top: 20px;
 }
 
 textarea {
@@ -31,10 +35,26 @@ textarea {
   font-size: 100%;
 }
 
+input.url {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  resize: none;
+  font-family: monospace;
+  font-size: 100%;
+}
+
+input.checkbox {
+    margin-right: 10px;
+}
+
 select.language {
 	font-family: monospace;
 	font-size: 100%;
 	width: 80%;
+	align: center;
 	margin-left: 40px;
 	margin-right: 40px;
 }
@@ -70,6 +90,7 @@ button:hover {
 
 .column {
   flex: 50%;
+  align: center;
 }
 
 

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <form action="/transcribe" method="post" novalidate>
+        <input type="url" class="url" autofocus id="url_to_transcribe" name="url_to_transcribe" placeholder="Input a url to transcribe">
+        <br>
+        <h3 align="center">Language Models:</h3>
+                <select name="model" id="model" class="language" required>
+                    {% for model in model_list %}
+                        {% if model.name == "en-US_BroadbandModel" %}
+                            <option selected value="{{model.name}}">
+                                {{model.name}} - {{model.description}}
+                            </option>
+                        {% else %}
+                            <option value="{{model.name}}">
+                                {{model.name}} - {{model.description}}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+        <div class="padding">
+            <br>
+        </div>
+        <div class="row" align="center">
+            <div class="column">
+                <input type="checkbox" class="checkbox" id="audio_metrics" name="audio_metrics" value="audio_metrics">Audio metrics<br>
+            </div>
+            <div class="column">
+                <input type="checkbox" class="checkbox" id="processing_metrics" name="processing_metrics" value="processing_metrics">Processing metrics<br>
+            </div>
+            <div class="column">
+                <input type="checkbox" class="checkbox" id="interim_results" name="interim_results" value="interim_results">Interim results<br>
+            </div>
+        </div>
+        <button type="submit"><b>Transcribe</b></button>
+    </form>
+</div>
+<div align="center">
+    <p>
+        {{audio_title}}
+    </p>
+    <audio controls="true" autoplay="true" name="speech-audio-player">
+	    <source src="{{audio_file}}" type="{{audio_format}}">
+    </audio>
+</div>
+<div>
+    <h3>Transcription:</h3>
+    <p>{{final_text}}</p>
+    <h3>Output:</h3>
+    <pre>
+        {{output}}
+    </pre>
+</div>
+{% endblock %}
+

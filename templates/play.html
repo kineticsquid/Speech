@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<body>
 <div>
 	<ul>
     {% for file in files %}
@@ -13,11 +12,9 @@
     {% endfor %}
 </ul>
 </div>
-</div>
+<div>
 <audio controls="" autoplay="" name="synthesized speech">
 	<source src="{{audio_file}}" type="{{audio_format}}">
 </audio>
-<div>
-</body>
+</div>
 {% endblock %}
-

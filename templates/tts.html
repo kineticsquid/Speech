@@ -5,20 +5,26 @@
     <form action="/synthesize" method="post" novalidate>
         <textarea autofocus id="text_to_synthsize" name="text_to_synthsize" placeholder="Input text to synthesize into speech"></textarea>
         <br>
-        <div class="row">
+        <div class="row" align="center">
             <div class="column">
                 <h3 align="center">Voice:</h3>
-                <select name="voice" id="voice" class="language">
+                <select name="voice" id="voice" class="language" required>
                     {% for voice in voice_list %}
-                    <option value="{{voice.name}}">
-                        {{voice.description}}
-                    </option>
+                        {% if voice.name == "en-US_LisaV2Voice" %}
+                            <option value="{{voice.name}}" selected>
+                                {{voice.description}}
+                            </option>
+                        {% else %}
+                            <option value="{{voice.name}}">
+                                {{voice.description}}
+                            </option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>
             <div class="column">
                 <h3 align="center">Audio format:</h3>
-                <select name="audio_format" id="audio_format" class="audio">
+                <select name="audio_format" id="audio_format" class="audio" required>
                     {% for format in audio_format_list %}
                         <option value="{{format}}">
                             {{format}}
