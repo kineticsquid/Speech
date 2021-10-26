@@ -1,0 +1,5 @@
+flask
+requests
+websocket-client
+ibm_watson
+gunicorn

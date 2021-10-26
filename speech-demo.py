@@ -22,6 +22,8 @@ import threading
 from threading import Thread
 import websocket
 
+app = Flask(__name__)
+
 """
 For debugging
 """
@@ -44,7 +46,7 @@ AUDIO_FORMATS = {
 }
 
 app = Flask(__name__)
-port = os.getenv('PORT', '5030')
+port = os.getenv('PORT', '5040')
 
 # Need these next two lines to eliminate the 'A secret key is required to use CSRF.' error
 SECRET_KEY = os.urandom(32)
@@ -169,11 +171,6 @@ def favicon():
     return app.send_static_file('images/favicon-96x96.png')
 
 
-@app.route('/build')
-def build():
-    return app.send_static_file('build.txt')
-
-
 @app.route('/voices')
 def voices():
     result = requests.get(TTS_API_URL + '/v1/voices', auth=tts_auth, headers=http_headers)
@@ -285,7 +282,8 @@ def transcribe():
     else:
         interim_results = True
 
-    result = requests.get(audio_url)
+    # Added this User-Agent header to eliminate 406 error
+    result = requests.get(audio_url, headers={"User-Agent": "XY"})
     if result.status_code != 200:
         raise Exception('Error %s retrieving audio file \'%s\'.' % (result.status_code, audio_url))
     audio_content = result.content
@@ -375,10 +373,20 @@ def transcribe():
                            audio_file=audio_url,
                            audio_title="%s - %s" % (model, audio_url))
 
-if __name__ == '__main__':
-    print('Starting %s....' % sys.argv[0])
-    print('Python: ' + sys.version)
-    print("url_root: %s" % url_root)
+@app.route('/build', methods=['GET', 'POST'])
+def build_date():
+    return date_environ
 
-    app.run(host='0.0.0.0', port=int(port))
+print('Starting %s....' % sys.argv[0])
+print('Python: ' + sys.version)
+date_environ = os.environ.get('DATE')
+if date_environ is None:
+    date_environ = 'dev environment'
+print('Running build: %s' % date_environ)
+print('Environment Variables:')
+environment_vars = dict(os.environ)
+print(environment_vars)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
