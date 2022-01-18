@@ -1,5 +1,5 @@
 flask
 requests
 websocket-client
-ibm_watson
+ibm-watson
 gunicorn
