@@ -36,6 +36,9 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+      - name: List speech-demo.py
+        run: cat speech-demo.py
+
       - name: Build hub.docker.com Docker image
         run: docker build ./ -t $DOCKER_HUB_IMAGE_NAME
 
@@ -60,5 +63,5 @@ jobs:
             STT_PORT=${{ secrets.GCP_PROJECT }}
 
 
-      - name: test the url
-        run: curl "${{ steps.deploy.outputs.url }}"/build
+#      - name: test the url
+#        run: curl "${{ steps.deploy.outputs.url }}"/build
