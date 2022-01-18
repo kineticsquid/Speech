@@ -102,8 +102,6 @@ http_headers = {'Content-Type': 'application/json',
                 'X-Watson-Metadata': 'customer_id=Fred'}
 stt_auth = ('apikey', STT_API_KEY)
 tts_auth = ('apikey', TTS_API_KEY)
-iam_token_manager = IAMTokenManager(apikey=STT_API_KEY)
-stt_access_token = iam_token_manager.get_token()
 
 # Get the list of available TTS voices
 result = requests.get(TTS_API_URL + '/v1/voices', auth=tts_auth, headers=http_headers)
@@ -263,6 +261,8 @@ def stt():
 
 @app.route('/transcribe', methods=['GET', 'POST'])
 def transcribe():
+    iam_token_manager = IAMTokenManager(apikey=STT_API_KEY)
+    stt_access_token = iam_token_manager.get_token()
     form = request.form
     audio_url = form['url_to_transcribe']
     model = form['model']
