@@ -15,6 +15,7 @@ RUN mkdir /app/static
 ADD static /app/static/
 RUN mkdir /app/templates
 ADD templates /app/templates/
+RUN date > /app/static/build.txt
 
 # Run app.py when the container launches
 CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 speech-demo:app
