@@ -36,9 +36,6 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: List speech-demo.py
-        run: cat speech-demo.py
-
       - name: Build hub.docker.com Docker image
         run: docker build ./ -t $DOCKER_HUB_IMAGE_NAME
 
@@ -54,13 +51,13 @@ jobs:
           source: ./
           region: us-central1
           env_vars: |
-            STT_API_KEY=${{ secrets.GCP_PROJECT }},
-            TTS_API_KEY=${{ secrets.GCP_PROJECT }},
-            STT_API_URL=${{ secrets.GCP_PROJECT }},
-            TTS_API_URL=${{ secrets.GCP_PROJECT }},
-            STT_WS_URL=${{ secrets.GCP_PROJECT }},
-            STT_HOST=${{ secrets.GCP_PROJECT }},
-            STT_PORT=${{ secrets.GCP_PROJECT }}
+            STT_API_KEY=${{ secrets.STT_API_KEY }},
+            TTS_API_KEY=${{ secrets.TTS_API_KEY }},
+            STT_API_URL=${{ secrets.STT_API_URL }},
+            TTS_API_URL=${{ secrets.TTS_API_URL }},
+            STT_WS_URL=${{ secrets.STT_WS_URL }},
+            STT_HOST=${{ secrets.STT_HOST }},
+            STT_PORT=${{ secrets.STT_PORT }}
 
 
 #      - name: test the url
