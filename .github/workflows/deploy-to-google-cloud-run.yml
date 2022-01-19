@@ -60,5 +60,5 @@ jobs:
             STT_PORT=${{ secrets.STT_PORT }}
 
 
-#      - name: test the url
-#        run: curl "${{ steps.deploy.outputs.url }}"/build
+      - name: test the url
+        run: curl "${{ steps.deploy.outputs.url }}"/build
