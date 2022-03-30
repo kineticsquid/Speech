@@ -1,3 +1,9 @@
+# My stuff
+.idea/
+static/audio/**
+!static/audio/tts-lisa-intro.ogg
+!static/audio/samples_cpp_windows_console_samples_whatstheweatherlike.wav
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
