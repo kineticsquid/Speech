@@ -10,3 +10,6 @@ docker push kineticsquid/speech-demo:latest
 # list the current images
 echo "Docker Images..."
 docker images
+
+echo "Now running..."
+./.vscode/run-image-locally.sh

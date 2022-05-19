@@ -1,21 +1,19 @@
-FROM python:3.9-alpine
+# Python image to use.
+FROM python:3.9
 
+# Set the working directory to /app
 WORKDIR /app
-RUN pip3 install --upgrade pip
-RUN pip3 install flask
-RUN pip3 install requests
-RUN pip3 install ibm_watson
-RUN pip3 install gunicorn
-RUN pip3 install websocket-client
 
-# Copy runtime files from the current directory into the container at /app
-ADD speech-demo.py /app
-ADD websocket-test.py /app
-RUN mkdir /app/static
-ADD static /app/static/
-RUN mkdir /app/templates
-ADD templates /app/templates/
+# copy the requirements file used for dependencies
+COPY requirements.txt .
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
+# Copy the rest of the working directory contents into the container at /app
+COPY . .
+
 RUN date > /app/static/build.txt
 
 # Run app.py when the container launches
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 speech-demo:app
+ENTRYPOINT ["python", "speech-demo.py"]

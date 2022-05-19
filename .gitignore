@@ -1,8 +1,6 @@
 # My stuff
-.idea/
-static/audio/**
-!static/audio/tts-lisa-intro.ogg
-!static/audio/samples_cpp_windows_console_samples_whatstheweatherlike.wav
+.vscode/
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -43,7 +41,7 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# Unit images / coverage reports
 htmlcov/
 .tox/
 .nox/
@@ -133,3 +131,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Pycharm
+.idea

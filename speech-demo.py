@@ -46,81 +46,12 @@ AUDIO_FORMATS = {
 }
 
 app = Flask(__name__)
-port = os.getenv('PORT', '5040')
 
 # Need these next two lines to eliminate the 'A secret key is required to use CSRF.' error
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 
-
-env_var = 'TTS_API_URL'
-if env_var in os.environ:
-    TTS_API_URL = os.environ[env_var]
-else:
-    raise Exception("Error no %s Defined!" % env_var)
-env_var = 'STT_API_URL'
-if env_var in os.environ:
-    STT_API_URL = os.environ[env_var]
-else:
-    raise Exception("Error no %s Defined!" % env_var)
-env_var = 'TTS_API_KEY'
-if env_var in os.environ:
-    TTS_API_KEY = os.environ[env_var]
-else:
-    raise Exception("Error no %s Defined!" % env_var)
-env_var = 'STT_API_KEY'
-if env_var in os.environ:
-    STT_API_KEY = os.environ[env_var]
-else:
-    raise Exception("Error no %s Defined!" % env_var)
-env_var = 'STT_WS_URL'
-if env_var in os.environ:
-    STT_WS_URL = os.environ[env_var]
-else:
-    raise Exception("Error no %s Defined!" % env_var)
-env_var = 'STT_HOST'
-if env_var in os.environ:
-    STT_HOST = os.environ[env_var]
-else:
-    raise Exception("Error no %s Defined!" % env_var)
-env_var = 'STT_PORT'
-if env_var in os.environ:
-    STT_PORT = os.environ[env_var]
-else:
-    raise Exception("Error no %s Defined!" % env_var)
-env_var = 'URL_ROOT'
-if env_var in os.environ:
-    url_root = os.environ[env_var]
-else:
-    url_root = ''
 AUDIO_FORMAT = 'audio/ogg'
-
-# Call to IAM to get an access token to use with STT websocket API.
-http_headers = {'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-Watson-Learning-Opt-Out': 'true',
-                'X-Watson-Metadata': 'customer_id=Fred'}
-stt_auth = ('apikey', STT_API_KEY)
-tts_auth = ('apikey', TTS_API_KEY)
-
-# Get the list of available TTS voices
-result = requests.get(TTS_API_URL + '/v1/voices', auth=tts_auth, headers=http_headers)
-if result.status_code != 200:
-    raise Exception('Error retrieving voices: %s - %s' % (result.status_code, result.content))
-content = result.json()
-voice_list = []
-for voice in content['voices']:
-    voice_list.append({'name': voice['name'], 'description': voice['description']})
-
-# Get the list of available STT language models
-result = requests.get(STT_API_URL + '/v1/models', auth=stt_auth, headers=http_headers)
-if result.status_code != 200:
-    raise Exception('Error retrieving models: %s - %s' % (result.status_code, result.content))
-content = result.json()
-model_list = []
-for model in content['models']:
-    model_list.append({'name': model['name'], 'description': model['description']})
-
 
 @app.before_request
 def do_something_whenever_a_request_comes_in():
@@ -406,5 +337,4 @@ for key in environment_vars.keys():
     print('%s: %s\n' % (key, environment_vars[key]))
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
-
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
